@@ -1,0 +1,33 @@
+name: build-jar
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: unzip project
+        run: |
+          mkdir proj
+          unzip -q linklyrics-project.zip -d proj
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: build
+        working-directory: proj
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
+      - name: upload jar
+        uses: actions/upload-artifact@v7
+        with:
+          name: mod-jar
+          path: |
+            proj/build/libs/*.jar
+            !proj/build/libs/*-sources.jar
+          
